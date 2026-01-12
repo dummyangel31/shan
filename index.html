@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 加入社群分享標籤，讓分享連結時更好看 -->
+    <meta property="og:title" content="大阪京都素食美好旅程">
+    <meta property="og:description" content="專為素食者設計的五日遊行程，包含環球影城、京都古蹟與嚴選素食美食指南。">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80">
+    
+    <title>大阪京都素食美好旅程</title>
+    <style>
+        :root {
+            /* 女性柔和色調配色盤 */
+            --bg-color: #FFF9F9; /* 溫暖的淺粉白 */
+            --primary-color: #E8A0BF; /* 柔和玫瑰粉 */
+            --secondary-color: #98D7C2; /* 薄荷綠 (代表素食/自然) */
+            --text-color: #5D5D5D; /* 深灰，比純黑柔和 */
+            --card-bg: #FFFFFF;
+            --accent-gold: #F0D9B5;
+            --shadow: 0 4px 15px rgba(232, 160, 191, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Noto Sans TC", "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-bottom: 50px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #fff, #FFF0F5);
+            padding: 20px 20px 30px; /* 增加底部 padding */
+            text-align: center;
+            border-bottom: 1px solid rgba(232, 160, 191, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        p.subtitle {
+            font-size: 0.9rem;
+            color: #888;
+            margin-bottom: 15px;
+        }
+
+        /* Weather Box */
+        .weather-box {
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--primary-color);
+            border-radius: 50px;
+            padding: 8px 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            color: #666;
+            box-shadow: 0 2px 8px rgba(232, 160, 191, 0.2);
+            max-width: 90%;
+        }
+
+        .weather-icon {
+            font-size: 1.2rem;
+        }
+
+        .weather-text b {
+            color: var(--primary-color);
+        }
+
+        /* Navigation (Dates) */
+        .nav-container {
+            display: flex;
+            justify-content: space-around;
+            background: #fff;
+            padding: 10px 5px;
+            overflow-x: auto;
+            position: sticky;
+            top: 130px; /* Adjust based on new header height */
+            z-index: 99;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+        }
+
+        @media (max-width: 400px) {
+            .nav-container {
+                top: 150px; /* Mobile adjust */
+            }
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            color: #999;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .nav-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 2px 8px rgba(232, 160, 191, 0.4);
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        .day-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .day-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards Layout */
+        .timeline {
+            display: grid;
+            grid-template-columns: 1fr; /* Default single column for strict timeline feel */
+            gap: 20px;
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 100%;
+            background-color: var(--primary-color);
+        }
+
+        .card.meal::before {
+            background-color: var(--secondary-color); /* Meal cards get green accent */
+        }
+
+        /* Time Badge */
+        .time-badge {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #999;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .time-badge::before {
+            content: '•';
+            margin-right: 5px;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        .card.meal .time-badge::before {
+            color: var(--secondary-color);
+        }
+
+        .tag {
+            align-self: flex-start;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        .tag.sightseeing {
+            background-color: #FFF0F5;
+            color: var(--primary-color);
+        }
+
+        .tag.food {
+            background-color: #E8F6F0;
+            color: #6CBF9C;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: #444;
+        }
+
+        .card-desc {
+            font-size: 0.95rem;
+            color: #777;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        /* Restaurant Details */
+        .restaurant-box {
+            background-color: #FAFAFA;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: auto; /* Push to bottom */
+            border-left: 3px solid var(--secondary-color);
+        }
+
+        .res-type {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #aaa;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .res-name {
+            font-weight: bold;
+            color: #555;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1rem;
+        }
+
+        .res-rating {
+            color: #FFB400;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .backup-list {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px dashed #ddd;
+        }
+
+        .backup-title {
+            font-size: 0.75rem;
+            color: #aaa;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .backup-item {
+            font-size: 0.85rem;
+            color: #777;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-top: 40px;
+            padding: 20px;
+        }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>大阪京都 • 素食慢旅</h1>
+    <p class="subtitle">Vegetarian Friendly Trip</p>
+    
+    <!-- 新增：氣候顯示區塊 -->
+    <div id="weather-display" class="weather-box">
+        <!-- JS 會自動填入內容 -->
+        <span class="weather-icon">🌤️</span>
+        <span class="weather-text">載入氣候資訊中...</span>
+    </div>
+</header>
+
+<!-- 日期導航欄 -->
+<nav class="nav-container" id="date-nav">
+    <!-- JS Will Inject Dates Here -->
+</nav>
+
+<div class="container" id="content-area">
+    <!-- Day 1 -->
+    <div class="day-section active" id="day-0">
+        <div class="timeline">
+            <!-- Card 1 -->
+            <div class="card">
+                <div class="time-badge">下午 14:00 - 16:00</div>
+                <span class="tag sightseeing">抵達 & 交通</span>
+                <h3 class="card-title">關西機場 ➝ 難波</h3>
+                <p class="card-desc">抵達關西機場(KIX)，搭乘南海電鐵特急 Rapi:t 前往難波/心齋橋地區辦理飯店入住。</p>
+            </div>
+            
+            <!-- Card 2 -->
+            <div class="card">
+                <div class="time-badge">傍晚 17:00 - 18:30</div>
+                <span class="tag sightseeing">逛街景點</span>
+                <h3 class="card-title">心齋橋 & 道頓堀</h3>
+                <p class="card-desc">漫步心齋橋筋商店街，前往道頓堀與「跑跑人 (Glico)」看板合影。感受大阪的熱情夜晚。</p>
+            </div>
+
+            <!-- Card 3 (Meal) -->
+            <div class="card meal">
+                <div class="time-badge">晚上 19:00</div>
+                <span class="tag food">晚餐推薦</span>
+                <h3 class="card-title">心齋橋素食大阪燒</h3>
+                
+                <div class="restaurant-box">
+                    <span class="res-type">🏆 首選推薦</span>
+                    <span class="res-name">OKO - Fun Okonomiyaki Bar</span>
+                    <span class="res-rating">🌟 4.8 (1,500+ 評論)</span>
+                    <p style="font-size:0.85rem; color:#666;">專門提供 Vegan/Vegetarian 菜單，無柴魚高湯，老闆娘熱情。</p>
+                    
+                    <div class="backup-list">
+                        <span class="backup-title">備選名單</span>
+                        <div class="backup-item">
+                            <span>Paprika Shokudo Vegan</span>
+                            <span>🌟 4.6</span>
+                        </div>
+                        <div class="backup-item">
+                            <span>千房 Chibo (道頓堀店)</span>
+                            <span>🌟 4.2</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Day 2 -->
+    <div class="day-section" id="day-1">
+        <div class="timeline">
+            <!-- Card 1 -->
+            <div class="card">
+                <div class="time-badge">上午 09:00 - 12:00</div>
+                <span class="tag sightseeing">USJ 上半場</span>
+                <h3 class="card-title">超級任天堂世界™</h3>
+                <p class="card-desc">早起入園直衝瑪利歐園區！體驗「瑪利歐賽車」與「耀西冒險」。<br><small>*建議攜帶少量飯糰以備不時之需。</small></p>
+            </div>
+
+            <!-- Card 2 (Meal) -->
+            <div class="card meal">
+                <div class="time-badge">中午 12:30</div>
+                <span class="tag food">園區午餐</span>
+                <h3 class="card-title">USJ 園區素食選擇</h3>
+                
+                <div class="restaurant-box">
+                    <span class="res-type">🏆 首選推薦 (紐約區)</span>
+                    <span class="res-name">Azzurra di Capri</span>
+                    <span class="res-rating">🌟 4.3</span>
+                    <p style="font-size:0.85rem; color:#666;">藍色洞窟披薩店，推薦蔬菜披薩 (Vegetable Pizza)。</p>
+
+                    <div class="backup-list">
+                        <span class="backup-title">備選名單</span>
+                        <div class="backup-item">
+                            <span>Kinopio's Cafe (蘑菇披薩碗)</span>
+                            <span>🌟 4.5</span>
+                        </div>
+                        <div class="backup-item">
+                            <span>三根掃帚 (沙拉/玉米)</span>
+                            <span>🌟 4.4</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="card">
+                <div class="time-badge">下午 14:00 - 18:00</div>
+                <span class="tag sightseeing">USJ 下半場</span>
+                <h3 class="card-title">哈利波特 & 小小兵</h3>
+                <p class="card-desc">前往哈利波特魔法世界喝奶油啤酒，接著玩小小兵與好萊塢區設施。</p>
+            </div>
+
+            <!-- Card 4 (Meal) -->
+            <div class="card meal">
+                <div class="time-badge">晚上 19:30</div>
+                <span class="tag food">市區晚餐</span>
+                <h3 class="card-title">難波/道頓堀素食</h3>
+                
+                <div class="restaurant-box">
+                    <span class="res-type">🏆 首選推薦</span>
+                    <span class="res-name">餃子王 道頓堀店</span>
+                    <span class="res-rating">🌟 4.5 (800+ 評論)</span>
+                    <p style="font-size:0.85rem; color:#666;">有 Vegetarian Gyoza 菜單，素餃子與炸豆腐。</p>
+
+                    <div class="backup-list">
+                        <span class="backup-title">備選名單</span>
+                        <div class="backup-item">
+                            <span>CoCo壹番屋 (素食咖哩)</span>
+                            <span>🌟 4.0</span>
+                        </div>
+                        <div class="backup-item">
+                            <span>藏壽司 (黃瓜卷/玉米軍艦)</span>
+                            <span>🌟 4.3</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Day 3 -->
+    <div class="day-section" id="day-2">
+        <div class="timeline">
+            <!-- Card 1 -->
+            <div class="card">
+                <div class="time-badge">上午 09:00 - 11:30</div>
+                <span class="tag sightseeing">京都上午</span>
+                <h3 class="card-title">伏見稻荷大社</h3>
+                <p class="card-desc">搭乘京阪電車前往京都。必看壯觀的「千本鳥居」，建議早晨抵達避開人潮。</p>
+            </div>
+
+            <!-- Card 2 (Meal) -->
+            <div class="card meal">
+                <div class="time-badge">中午 12:00</div>
+                <span class="tag food">稻荷午餐</span>
+                <h3 class="card-title">伏見稻荷周邊</h3>
+                
+                <div class="restaurant-box">
+                    <span class="res-type">🏆 首選推薦</span>
+                    <span class="res-name">Vermillion - cafe</span>
+                    <span class="res-rating">🌟 4.6 (900+ 評論)</span>
+                    <p style="font-size:0.85rem; color:#666;">環境清幽，推薦素食早午餐盤 (Vegan Plate)。</p>
+
+                    <div class="backup-list">
+                        <span class="backup-title">備選名單</span>
+                        <div class="backup-item">
+                            <span>清水順正 おかべ家 (湯豆腐)</span>
+                            <span>🌟 4.2</span>
+                        </div>
+                        <div class="backup-item">
+                            <span>Kendonya (確認高湯)</span>
+                            <span>🌟 4.4</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="card">
+                <div class="time-badge">下午 14:00 - 17:00</div>
+                <span class="tag sightseeing">京都下午</span>
+                <h3 class="card-title">清水寺 & 祇園</h3>
+                <p class="card-desc">參觀清水舞台，漫步二三年坂古街，最後抵達祇園花見小路感受古都風情。</p>
+            </div>
+
+            <!-- Card 4 (Meal) -->
+            <div class="card meal">
+                <div class="time-badge">晚上 18:00</div>
+                <span class="tag food">河原町晚餐</span>
+                <h3 class="card-title">京都精緻素食</h3>
+                
+                <div class="restaurant-box">
+                    <span class="res-type">🏆 首選推薦</span>
+                    <span class="res-name">Mumokuteki Cafe Kyoto</span>
+                    <span class="res-rating">🌟 4.3 (800+ 評論)</span>
+                    <p style="font-size:0.85rem; color:#666;">文青風全素咖啡廳，推薦豆腐漢堡排定食。</p>
+
+                    <div class="backup-list">
+                        <span class="backup-title">備選名單</span>
+                        <div class="backup-item">
+                            <span>Ain Soph. Journey</span>
+                            <span>🌟 4.5</span>
+                        </div>
+                        <div class="backup-item">
+                            <span>祇園 Tanto (素大阪燒)</span>
+                            <span>🌟 4.3</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Day 4 -->
+    <div class="day-section" id="day-3">
+        <div class="timeline">
+            <!-- Card 1 -->
+            <div class="card">
+                <div class="time-badge">上午 09:30 - 11:30</div>
+                <span class="tag sightseeing">大阪歷史</span>
+                <h3 class="card-title">大阪城公園</h3>
+                <p class="card-desc">參觀壯麗的大阪城天守閣，漫步公園感受戰國歷史氛圍。</p>
+            </div>
+
+            <!-- Card 2 (Meal) -->
+            <div class="card meal">
+                <div class="time-badge">中午 12:30</div>
+                <span class="tag food">本町午餐</span>
+                <h3 class="card-title">老牌純素餐廳</h3>
+                
+                <div class="restaurant-box">
+                    <span class="res-type">🏆 首選推薦</span>
+                    <span class="res-name">Green Earth</span>
+                    <span class="res-rating">🌟 4.7 (700+ 評論)</span>
+                    <p style="font-size:0.85rem; color:#666;">大阪歷史最悠久素食店，每日午餐盤、披薩。</p>
+
+                    <div class="backup-list">
+                        <span class="backup-title">備選名單</span>
+                        <div class="backup-item">
+                            <span>Mos Burger (Green Burger)</span>
+                            <span>🌟 3.9</span>
+                        </div>
+                        <div class="backup-item">
+                            <span>得正 Tokumasa (咖哩飯)</span>
+                            <span>🌟 4.1</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="card">
+                <div class="time-badge">下午 14:30 - 17:30</div>
+                <span class="tag sightseeing">梅田購物</span>
+                <h3 class="card-title">梅田百貨商圈</h3>
+                <p class="card-desc">前往 Grand Front Osaka 或 LUCUA 逛街，感受大阪最時尚的區域。</p>
+            </div>
+
+             <!-- Card 4 -->
+             <div class="card">
+                <div class="time-badge">傍晚 18:00 - 19:30</div>
+                <span class="tag sightseeing">百萬夜景</span>
+                <h3 class="card-title">梅田藍天大廈</h3>
+                <p class="card-desc">登上空中庭園展望台，360 度俯瞰大阪絕美夜景。</p>
+            </div>
+
+            <!-- Card 5 (Meal) -->
+            <div class="card meal">
+                <div class="time-badge">晚上 20:00</div>
+                <span class="tag food">梅田晚餐</span>
+                <h3 class="card-title">素食拉麵 & 定食</h3>
+                
+                <div class="restaurant-box">
+                    <span class="res-type">🏆 首選推薦</span>
+                    <span class="res-name">CHABUTON (Yodobashi店)</span>
+                    <span class="res-rating">🌟 3.8 (好吃推薦)</span>
+                    <p style="font-size:0.85rem; color:#666;">米其林主廚監修，指名「新野菜系拉麵」。</p>
+
+                    <div class="backup-list">
+                        <span class="backup-title">備選名單</span>
+                        <div class="backup-item">
+                            <span>24/7 Café Apartment</span>
+                            <span>🌟 4.0</span>
+                        </div>
+                        <div class="backup-item">
+                            <span>Shake Shack ('Shroom)</span>
+                            <span>🌟 4.4</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Day 5 -->
+    <div class="day-section" id="day-4">
+        <div class="timeline">
+            <!-- Card 1 (Meal) -->
+            <div class="card meal">
+                <div class="time-badge">上午 10:00</div>
+                <span class="tag food">早午餐</span>
+                <h3 class="card-title">黑門市場邊走邊吃</h3>
+                <p class="card-desc">素食者可選：高橋食品(濃豆漿/豆腐甜甜圈)、水果攤(草莓/哈密瓜)、現烤玉米地瓜。</p>
+                <div class="restaurant-box" style="margin-top: 10px;">
+                    <div class="backup-list" style="border-top: none; margin-top: 0; padding-top: 0;">
+                        <span class="backup-title">備選名單</span>
+                        <div class="backup-item">
+                            <span>美津の (山藥燒-素)</span>
+                            <span>🌟 4.3</span>
+                        </div>
+                        <div class="backup-item">
+                            <span>串炸達人 (蔬菜串)</span>
+                            <span>🌟 4.1</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="card">
+                <div class="time-badge">下午 13:00 - 15:30</div>
+                <span class="tag sightseeing">最後衝刺</span>
+                <h3 class="card-title">難波 / 臨空城 Outlet</h3>
+                <p class="card-desc">依班機時間，在難波補買伴手禮，或前往機場旁的 Rinku Premium Outlets 血拼。</p>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="card">
+                <div class="time-badge">傍晚 16:00</div>
+                <span class="tag sightseeing">返程</span>
+                <h3 class="card-title">前往關西機場</h3>
+                <p class="card-desc">搭乘南海電鐵或 Haruka 前往機場，結束美好的旅程。機場內可吃 Mos Burger 綠色漢堡。</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>Bon Voyage! 祝您旅途愉快 ❤️</p>
+</footer>
+
+<script>
+    // 自動生成日期邏輯 (從明天開始)
+    const daysOfWeek = ["(日)", "(一)", "(二)", "(三)", "(四)", "(五)", "(六)"];
+    
+    // 設定開始日期為明天
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() + 1);
+
+    const navContainer = document.getElementById('date-nav');
+    
+    // 生成 5 天的按鈕
+    for (let i = 0; i < 5; i++) {
+        let currentDate = new Date(startDate);
+        currentDate.setDate(startDate.getDate() + i);
+        
+        let month = currentDate.getMonth() + 1;
+        let day = currentDate.getDate();
+        let weekDay = daysOfWeek[currentDate.getDay()];
+        
+        let formattedDate = `${month}/${day} ${weekDay}`;
+        
+        const btn = document.createElement('button');
+        btn.className = `nav-btn ${i === 0 ? 'active' : ''}`;
+        btn.innerText = formattedDate;
+        btn.onclick = () => switchDay(i, btn);
+        navContainer.appendChild(btn);
+    }
+
+    // 更新氣候資訊 (基於起始日期的月份)
+    function updateWeatherDisplay() {
+        const month = startDate.getMonth() + 1;
+        const weatherEl = document.getElementById('weather-display');
+        
+        // 簡單的氣候數據庫 (大阪/京都平均)
+        let weatherData = {
+            spring: { temp: "10°C - 20°C", text: "氣候舒適，早晚偏涼，建議洋蔥式穿搭 (薄外套)", icon: "🌸" },
+            summer: { temp: "24°C - 33°C", text: "炎熱潮濕，請務必防曬並多補充水分", icon: "☀️" },
+            autumn: { temp: "15°C - 25°C", text: "涼爽宜人，適合風衣或針織衫", icon: "🍁" },
+            winter: { temp: "2°C - 10°C", text: "寒冷乾燥，請備妥羽絨衣、圍巾與手套", icon: "❄️" }
+        };
+
+        let currentSeason;
+        if (month >= 3 && month <= 5) currentSeason = weatherData.spring;
+        else if (month >= 6 && month <= 9) currentSeason = weatherData.summer;
+        else if (month >= 10 && month <= 11) currentSeason = weatherData.autumn;
+        else currentSeason = weatherData.winter;
+
+        weatherEl.innerHTML = `
+            <span class="weather-icon">${currentSeason.icon}</span>
+            <span class="weather-text"><b>${month}月預測:</b> ${currentSeason.temp} | ${currentSeason.text}</span>
+        `;
+    }
+
+    // 初始化呼叫
+    updateWeatherDisplay();
+
+    // 切換日期的功能
+    function switchDay(index, btnElement) {
+        // 1. 處理按鈕樣式
+        const buttons = document.querySelectorAll('.nav-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        btnElement.classList.add('active');
+
+        // 2. 處理內容顯示
+        const sections = document.querySelectorAll('.day-section');
+        sections.forEach(sec => sec.classList.remove('active'));
+        
+        const targetSection = document.getElementById(`day-${index}`);
+        if(targetSection) {
+            targetSection.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+</script>
+
+</body>
+</html>
